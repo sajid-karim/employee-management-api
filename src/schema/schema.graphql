@@ -1,0 +1,95 @@
+scalar Date
+
+enum Role {
+  ADMIN
+  EMPLOYEE
+}
+
+enum EmployeeSortField {
+  NAME
+  AGE
+  CLASS
+  ATTENDANCE
+  CREATED_AT
+}
+
+enum SortDirection {
+  ASC
+  DESC
+}
+
+type Employee {
+  id: ID!
+  name: String!
+  email: String!
+  age: Int!
+  class: String!
+  subjects: [String!]!
+  attendance: Float!
+  role: Role!
+  dateOfJoining: Date!
+  lastAttendanceUpdate: Date
+  createdAt: Date!
+  updatedAt: Date!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  totalPages: Int!
+  totalCount: Int!
+}
+
+type EmployeePage {
+  edges: [Employee!]!
+  pageInfo: PageInfo!
+}
+
+input EmployeeFilter {
+  name: String
+  class: String
+  minAge: Int
+  maxAge: Int
+  minAttendance: Float
+}
+
+input EmployeeSort {
+  field: EmployeeSortField!
+  direction: SortDirection!
+}
+
+input CreateEmployeeInput {
+  name: String!
+  email: String!
+  age: Int!
+  class: String!
+  subjects: [String!]!
+  role: Role!
+}
+
+input UpdateEmployeeInput {
+  name: String
+  email: String
+  age: Int
+  class: String
+  subjects: [String!]
+  attendance: Float
+}
+
+type Query {
+  employees(
+    filter: EmployeeFilter
+    sort: EmployeeSort
+    page: Int = 1
+    pageSize: Int = 10
+  ): EmployeePage! @auth(requires: [ADMIN, EMPLOYEE])
+  
+  employee(id: ID!): Employee @auth(requires: [ADMIN, EMPLOYEE])
+}
+
+type Mutation {
+  createEmployee(input: CreateEmployeeInput!): Employee! @auth(requires: [ADMIN])
+  updateEmployee(id: ID!, input: UpdateEmployeeInput!): Employee! @auth(requires: [ADMIN])
+}
+
+directive @auth(requires: [Role!]!) on FIELD_DEFINITION
