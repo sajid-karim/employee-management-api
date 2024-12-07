@@ -46,6 +46,14 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+app.use((_, res, next) => {
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self'; script-src 'self' 'unsafe-inline' https://apollo-server-landing-page.cdn.apollographql.com; img-src 'self' data: https://apollo-server-landing-page.cdn.apollographql.com; connect-src 'self' https://apollo-server-landing-page.cdn.apollographql.com; style-src 'self' 'unsafe-inline'; font-src 'self' https://apollo-server-landing-page.cdn.apollographql.com"
+  );
+  next();
+});
+
 app.use(helmet({
   contentSecurityPolicy: process.env['NODE_ENV'] === 'production' ? undefined : false,
   crossOriginEmbedderPolicy: false
